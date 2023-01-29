@@ -1,0 +1,22 @@
+
+**	HLCPDE	- (HL) COMPARED TO (DE)
+*
+*	THIS ROUTINE IS DOUBLE WORD COMPARE OF REGISTER PAIRS (DE) AND (HL).
+*
+*	ENTRY:	(HL)&(DE) SET UP
+*
+*	EXIT:	(PSW)	=
+*			 'Z' SET   IF (HL) =  (DE)
+*			 'C' SET   IF (HL) <  (DE)
+*			 'C' CLEAR IF (HL) >= (DE)
+*
+*
+*	USES:	(PSW)
+*
+
+HLCPDE	MOV	A,H
+	CMP	D	'C' SET => (A) < (D)
+	RNZ
+	MOV	A,L
+	CMP	E	'C' SET => (L) < (E)
+	RET

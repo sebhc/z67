@@ -5,7 +5,8 @@
         SPACE   4,10
 **      Register addresses
 *
-BASE67  EQU     274Q            Controller base address
+*BASE67  EQU     274Q            Controller base address
+BASE	EQU     170Q            Controller base address
 
 RI.DAT  EQU     0               Data In/Out (Read/Write)
 RI.CON  EQU     1               Control (Write Only)

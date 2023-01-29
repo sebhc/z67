@@ -1,0 +1,59 @@
+        SPACE   4,10
+**      $BCRC - GENERATE CRC16 ON A BLOCK OF DATA.
+*
+*       *** WARNING ***
+*
+*       THIS CRC-16 IS NOT COMPATIBLE WITH THE ONE
+*       PRODUCED BY PAM-8, AND THE DECK CRC.COM!
+*
+*       ENTRY   (BC) = BYTE COUNT
+*               (HL) = ADDRESS
+*               (DE) = CRC ACCUMULATOR
+*       EXIT    (HL) = (HL)+(BC)
+*               (DE) = NEW CRC
+*       USES    ALL
+
+
+$BCRC   MOV     A,B
+        ORA     C
+        RZ                      NO MORE
+        MOV     A,M             (A) = NEW BYTE
+        PUSH    H
+        PUSH    B               SAVE REGISTERS
+        XRA     E
+        MOV     B,A
+        RRC
+        RRC
+        RRC
+        RRC
+        MOV     C,A
+        XRA     B
+        ANI     0F0H
+        XRA     D
+        MOV     L,A
+        MOV     A,C
+        RLC
+        ANI     1FH
+        XRA     L
+        MOV     L,A
+        MOV     A,B
+        RLC
+        ANI     1
+        XRA     D
+        XRA     L
+        MOV     D,A
+        MOV     A,C
+        ANI     0F0H
+        XRA     B
+        MOV     E,A
+        MOV     A,C
+        XRA     B
+        RLC
+        ANI     0E0H
+        XRA     E
+        MOV     E,A
+        POP     B
+        POP     H
+        INX     H
+        DCX     B
+        JMP     $BCRC
