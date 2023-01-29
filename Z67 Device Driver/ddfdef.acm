@@ -1,0 +1,14 @@
+DDFDEF  SPACE   3,10
+**      DIRECTORY DEVICE FORMAT DEFINITION.                     /80.09.gc/
+*
+*       Modified:       Sep-80
+*                        No longer require 2 sectors per group
+*                        Reserved Group Table dynamically allocated
+*
+
+        ORG     0
+
+DDF.BOO DS      9               2K BOOT PROGRAM
+DDF.BOL EQU     *               LENGTH OF BOOT
+DDF.LAB DS      1               LABEL SECTOR
+DDF.USR DS      0               BEGINNING OF OPEN SPACE

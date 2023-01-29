@@ -1,0 +1,122 @@
+**      H67 Disk Controller Definitions
+*
+*	Added CB.xxx offsets	March 2016 gfr
+*
+        SPACE   4,10
+**      Register addresses
+*
+BASE67  EQU     274Q            Controller base address
+
+RI.DAT  EQU     0               Data In/Out (Read/Write)
+RI.CON  EQU     1               Control (Write Only)
+RI.BST  EQU     1               Bus Status (Read Only)
+        SPACE   4,10
+*       Control Register Definition
+
+BC.SEL  EQU     01000000B       Select and data bit 0
+BC.IE   EQU     00100000B       Interrupt Enable
+BC.RST  EQU     00010000B       Reset
+BC.EDT  EQU     00000010B       Enable Data
+        SPACE   4,10
+*       Bus Status Register Definition
+
+BS.REQ  EQU     10000000B       Bus Transfer Request
+BS.DTD  EQU     01000000B       Data Transfer Direction
+BS.IN   EQU     00000000B        Data to Host
+BS.OUT  EQU     01000000B        Data to Controller
+BS.LMB  EQU     00100000B       Last byte in data/command string
+BS.MTY  EQU     00010000B       Message type
+BS.DAT  EQU     00000000B        Data
+BS.COM  EQU     00010000B        Command
+BS.BSY  EQU     00001000B       Busy
+BS.INT  EQU     00000100B       Interrupt Pending
+BS.PE   EQU     00000010B       Parity Error
+BS.HID  EQU     00000001B       Hardware Identification
+        SPACE   4,10
+*       Status Byte Definitions
+
+ST.LUN  EQU     01100000B       Logical Unit
+ST.SPR  EQU     00011100B       Spare
+ST.ERR  EQU     00000010B       Error
+ST.PER  EQU     00000001B       Parity Error
+        SPACE   4,10
+**      Commands
+*
+
+CLASSM  EQU     11100000B       Class Mask
+
+CLASS0  EQU     00000000B       Class 0
+CLASS1  EQU     00100000B       Class 1
+CLASS6  EQU     11000000B       Class 6
+
+OPCODM  EQU     00011111B       Op-code Mask
+LUNM    EQU     01100000B       Logical Unit Mask
+LSA.2   EQU     00011111B       Logical Sector Address (2)
+        SPACE   4,10
+*
+*       Class 0 data structures and commands
+*
+*	Offsets in Class 0 Command Descriptor Block 
+*
+CB.CMD	EQU	0		Opcode
+CB.AD2	EQU	1		LUN | Address2
+CB.AD1	EQU	2		Address1
+CB.AD0	EQU	3		Address0
+CB.NBK	EQU	4		Number of blocks
+CB.CTL	EQU	5		Control mask
+*
+CBYTE	EQU	18H		Control byte to access high storage
+*
+*	Class 0 Commands
+*
+D.TDR   EQU     CLASS0+0        Test drive ready
+D.REC   EQU     CLASS0+1        Recalibrate drive
+D.RSY   EQU     CLASS0+2        Request Syndrome
+D.RSE   EQU     CLASS0+3        Request Sense
+D.FOR   EQU     CLASS0+4        Format Drive
+D.CTF   EQU     CLASS0+5        Check track format
+D.FT    EQU     CLASS0+6        Format Track
+D.FBS   EQU     CLASS0+7        Format bad sector
+D.REA   EQU     CLASS0+8        Read
+D.WPS   EQU     CLASS0+9        Write protect the sector
+D.WRI   EQU     CLASS0+10       Write
+D.SEK   EQU     CLASS0+11       Seek
+        SPACE   4,10
+*       Class 1 Commands
+
+D.CP3   EQU     CLASS1+0        Copy block
+        SPACE   4,10
+*       Class 6 Commands
+
+D.FFD   EQU     CLASS6+0        Format floppy disk
+        SPACE   4,10
+*       Type 0 error codes (Drive error Codes)
+
+T0.NST  EQU     0               No status
+T0.NIS  EQU     1               No Index signal
+T0.NSC  EQU     2               No seek complete
+T0.WFT  EQU     3               Write fault
+T0.DNR  EQU     4               Drive not ready
+T0.DNS  EQU     5               Drive not selected
+T0.NT0  EQU     6               No track zero
+TO.MDS  EQU     7               Mult-drive selected
+        SPACE   4,10
+*       Type 1 error codes (data error codes)
+
+T1.ID   EQU     0               ID Read Error
+T1.UDE  EQU     1               Uncorrectable data error
+T1.IDNF EQU     2               ID Address Mark not found
+T1.DMNF EQU     3               Data Address Mark Not FOund
+T1.RNF  EQU     4               Record Not Found
+T1.SKE  EQU     5               Seek Error
+T1.DTE  EQU     6               DMA Time-out Error (not used)
+T1.WP   EQU     7               Write protected
+T1.CDE  EQU     8               Correctable Data field Error
+T1.BBF  EQU     9               Bad Block Found
+T1.FE   EQU     10              Format Error
+        SPACE   4,10
+*       Type 2 Error Codes (Command error codes)
+
+T2.ILC  EQU     0               Illegal Command
+T2.IDA  EQU     1               Illegal Disk Address
+T2.IFN  EQU     2               Illegal Function
