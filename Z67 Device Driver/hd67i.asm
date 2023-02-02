@@ -28,8 +28,11 @@ NBPS	EQU	256		Bytes/Sector
 DC.GDP	EQU	100		Get Disk Parameters
 
 MI.JMP	EQU	303Q		8080 Jump Instruction
-MI.SBCB	EQU	102355A		Z80 instruction: HL <- HL - BC - Carry
-MI.SBCD	EQU	122355A		Z80 instruction: HL <- HL - DE - Carry
+*
+*	Remove Z80 dependencies		/GFR 1/23/
+*
+*MI.SBCB	EQU	102355A		Z80 instruction: HL <- HL - BC - Carry
+*MI.SBCD	EQU	122355A		Z80 instruction: HL <- HL - DE - Carry
 
 IOPORT	EQU	274Q		Base I/O port
 
@@ -152,9 +155,17 @@ RTN23   IN      IOPORT+RI.BST	Input bus status
 	ANA     A		clear flags
 	LHLD    RDPTR
 	LXI     B,1
+*
+*	Remove Z80 dependency	/GFR	1/23/
+*
+*	DW	MI.SBCB		HL <- HL - BC - Carry (z80)
+	MOV	A,L		Low byte
+	SBB	C		(with carry)
+	MOV	L,A
+	MOV	A,H		High byte
+	SBB	B		(continue carry)
+	MOV	H,A
 	
-	DW	MI.SBCB		HL <- HL - BC - Carry (z80)
-
 	JC      RTN23
 	SHLD    RDPTR
 	STAX    D
@@ -398,8 +409,18 @@ IDS	CALL	$$DRVR
 	XRA     A		clear 'c'
 	
 *	compute the size (End - Start)
-	DW	MI.SBCB		HL <- HL - BC - Carry (z80)
 
+*
+*	Remove Z80 dependency	/GFR	1/23/
+*
+*	DW	MI.SBCB		HL <- HL - BC - Carry (z80)
+	MOV	A,L		Low byte
+	SBB	C		(with carry)
+	MOV	L,A
+	MOV	A,H		High byte
+	SBB	B		(continue carry)
+	MOV	H,A
+	
 	MOV     A,L
 	ANA     A
 	JNZ     IDS1
@@ -468,12 +489,24 @@ IDS4	XCHG
 	XCHG
 	LHLD    VOLSIZ
 	XRA     A
+*
+*	Remove Z80 dependency	/GFR 1/23/
+*
+*	DW	MI.SBCD		HL <- HL - DE - Carry
+	MOV	A,L		Low byte
+	SBB	E		(with carry)
+	MOV	L,A
+	MOV	A,H		High byte
+	SBB	D		(continue carry)
+	MOV	H,A
 
-	DW	MI.SBCD		HL <- HL - DE - Carry
+	CALL	HLCPDE		Set 'Z' flag
 	
 	JNZ     IDS4		keep looping...
 IDS5	XRA     A
 IDS6	RET
+
+	XTEXT	HLCPDE
 *
 *	ZBLANK - convert zero to blank
 *
@@ -486,7 +519,6 @@ ZBLANK	MOV     A,M
 ZBLNK1	STC
 ZBLNK2	INX     H
 	RET
-
 
 DMESG   DB	ESC,'k'		H19 go to saved position
 DBUFF   DB	0,0,0,0,0,'.'

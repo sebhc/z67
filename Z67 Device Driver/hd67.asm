@@ -8,7 +8,9 @@
 *
 *       G. Roberts		17 September 2011
 *
-
+*	Replaced Z80 instructions with equivalent 8080 ones
+*	G. Roberts		31 January 2023
+*
 	XTEXT	ASCII
 	XTEXT	ECDEF
 	XTEXT	DDDEF
@@ -35,8 +37,11 @@ HDCAP	EQU	DT.CW+DT.CR+DT.DD+DT.RN		Read, Write, Directory, Random
 SAT.ET	EQU	1FH		End marker for Sector Allocation Table
 MASK.WP	EQU	10000000B	Write Protect flag mask
 
-MI.SBCB	EQU	102355A		Z80 instruction: HL <- HL - BC - Carry
-MI.SBCD	EQU	122355A		Z80 instruction: HL <- HL - DE - Carry
+*
+*	Removed Z80 dependencies		/GFR 1/23/
+*
+*MI.SBCB	EQU	102355A		Z80 instruction: HL <- HL - BC - Carry
+*MI.SBCD	EQU	122355A		Z80 instruction: HL <- HL - DE - Carry
 
 IOPORT	EQU	274Q		Base I/O port
 
@@ -323,7 +328,17 @@ HDREADX	IN      IOPORT+RI.BST	input bus status
         ANA     A		set flags
         LHLD    BCOUNT		load byte count
         LXI     B,1
-	DW	MI.SBCB		HL <- HL - BC - Carry (z80)
+*
+*	Removed Z80 dependencies		/GFR 1/23/
+*
+*	DW	MI.SBCB		HL <- HL - BC - Carry (z80)
+	MOV	A,L
+	SBB	C		(with carry)
+	MOV	L,A
+	MOV	A,H		High byte
+	SBB	B		(continue carry)
+	MOV	H,A
+	
         JC      HDREADX
         SHLD    BCOUNT		store byte count
         STAX    D		store byte
@@ -728,7 +743,16 @@ ADTRAN	LDA     DC.RAW
 *	make sure we're not trying to read beyond the end of 
 *	the partition!
 *
-	DW	MI.SBCB		HL <- HL - BC - Carry (z80)
+*	Remove Z80 dependency		/GFR 1/23/
+*
+*	DW	MI.SBCB		HL <- HL - BC - Carry (z80)
+	MOV	A,L
+	SBB	C		(with carry)
+	MOV	L,A
+	MOV	A,H		High byte
+	SBB	B		(continue carry)
+	MOV	H,A
+	
         JC      ADTR3		too big a request!
 *
 *	otherwise we're done!
@@ -967,14 +991,34 @@ RTN76   PUSH    B
         XRA     A		clear 'C'
         LXI     D,1
         XCHG			HL = 1; DE = sector no.
-	DW	MI.SBCD		HL <- HL - DE - Carry
+*
+*	Remove Z80 dependency	/GFR 1/23/
+*
+*	DW	MI.SBCD		HL <- HL - DE - Carry
+	MOV	A,L		Low byte
+	SBB	E		(with carry)
+	MOV	L,A
+	MOV	A,H		High byte
+	SBB	D		(continue carry)
+	MOV	H,A
+	
         JC      RTN77		jump if 2 or more?
         XCHG
         MOV     A,B
         CALL    $DADA		HL = HL + 0,A
-        XRA     A
+        XRA     Af
         LXI     B,2
-	DW	MI.SBCB		HL <- HL - BC - Carry (z80)
+*
+*	Remvoe Z80 dependency	/GFR 1/23/
+*
+*	DW	MI.SBCB		HL <- HL - BC - Carry (z80)
+	MOV	A,L
+	SBB	C		(with carry)
+	MOV	L,A
+	MOV	A,H		High byte
+	SBB	B		(continue carry)
+	MOV	H,A
+
         JC      RTN77
         MOV     D,E
         MVI     E,0
@@ -1003,6 +1047,7 @@ RTN77   POP     D
         POP     H
         POP     B
         RET
+
 
 ***	Working storage
 *
